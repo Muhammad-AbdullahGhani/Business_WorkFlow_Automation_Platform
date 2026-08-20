@@ -1,58 +1,130 @@
-# SmartFlow AI (Local MVP)
+# ⚡ SmartFlow AI — Enterprise AI Workflow Automation Platform
 
-SmartFlow AI is a full-stack workflow automation platform for SMBs, with a modern dashboard and AI-generated workflows.
+SmartFlow AI is an autonomous, full-stack business workflow automation engine tailored for SMBs and enterprise teams. It turns natural language business prompts into structured, multi-step state machines powered by **LangGraph**, integrates document intelligence, RAG vector search, third-party triggers & dispatchers, and delivers real-time ROI tracking.
 
-## Stack
+---
 
-- Frontend: Next.js (App Router) + TypeScript + Tailwind CSS
-- Backend: FastAPI + LangGraph-ready agent service
-- Database: PostgreSQL (pgvector image) + Redis via Docker Compose
-- AI: Local LLM through Ollama-compatible API
+## 🌟 Key Features
 
-## Run Locally
+- **🤖 Multi-Provider AI Workflow Generator**:
+  - Automatically synthesizes complex multi-node automation pipelines from natural language prompts.
+  - Supports **Groq Cloud (Llama 3.3 70B)**, **OpenAI (GPT-4o-mini)**, **Google Gemini 2.0**, **Local Ollama**, and an **Intelligent Offline Semantic Rule Engine**.
+- **🛠️ Interactive Drag-and-Drop Workflow Builder**:
+  - Reorder, customize, add, and remove LangGraph nodes on a visual sortable canvas.
+  - Rich node catalog: Webhooks, Email triggers, Stripe billing, Document OCR extraction, RAG vector lookup, AI decision gates, Slack notifications, and WhatsApp alerts.
+- **⚡ Live LangGraph State Machine Execution**:
+  - Real-time pipeline simulation with step-by-step trace inspection, execution duration (ms), input/output payloads, and estimated labor hours saved.
+- **📊 Business ROI & Analytics Dashboard**:
+  - Executive KPI cards (AI tasks executed, active automations, hours saved, success rate).
+  - Interactive Recharts performance trend charts and category distributions.
+- **📚 Pre-Built SMB Automation Templates**:
+  - 1-click clone enterprise-grade templates: AI Invoice Scanner, Customer Support Triage, Inbound Lead Scoring, Stripe Failed Payment Dunning, and Negative Review Escalation.
+- **🗄️ Resilient Database Architecture**:
+  - Out-of-the-box zero-configuration **SQLite** for local development + seamless **PostgreSQL (pgvector)** support for Supabase, Neon, and Docker.
 
-### 1) Start infrastructure
+---
 
-```bash
-docker compose up -d
+## 🏗️ Architecture
+
+```mermaid
+graph TD
+    User([User Prompt / UI]) -->|Next.js 16 + React 19| FE[Frontend Dashboard]
+    FE -->|REST API| BE[FastAPI Backend]
+    
+    subgraph AI Engine
+        BE -->|Synthesize Pipeline| AI[Multi-Provider LLM Engine]
+        AI -->|Groq / OpenAI / Gemini / Ollama / Fallback| WFDraft[Generated Workflow Definition]
+    end
+    
+    subgraph LangGraph State Machine
+        BE -->|Execute /workflows/id/run-test| LG[LangGraph Engine]
+        LG --> N1[Trigger: Webhook / Email / Stripe]
+        N1 --> N2[AI OCR / RAG Search / Sentiment]
+        N2 --> N3[Integrations: Slack / Email / CRM]
+        N3 --> N4[Analytics & ROI Calculation]
+    end
+    
+    BE -->|Persistence & History| DB[(PostgreSQL / SQLite)]
 ```
 
-### 2) Start backend
+---
+
+## 🚀 Quickstart (Local Development)
+
+### 1. Clone & Setup Backend
 
 ```bash
 cd backend
 python -m venv .venv
+
+# Activate virtualenv:
+# On Windows:
 .venv\Scripts\activate
+# On macOS/Linux:
+source .venv/bin/activate
+
 pip install -r requirements.txt
-copy .env.example .env
 uvicorn app.main:app --reload --port 8000
 ```
+Backend API will start at `http://localhost:8000` (Swagger docs at `http://localhost:8000/docs`).
 
-### 3) Start frontend
+### 2. Setup Frontend
 
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+Open `http://localhost:3000` in your browser.
 
-Open `http://localhost:3000`.
+---
 
-## Current MVP Features
+## 🌐 100% Free Cloud Deployment
 
-- AI prompt to workflow generation (`/workflows/create-from-prompt`)
-- Workflow list and dashboard stats
-- Local LLM support (Ollama endpoint + model in `.env`)
-- RAG service placeholder ready for pgvector retrieval integration
-- Drag-and-drop workflow builder in UI (save per workflow)
-- LangGraph test pipeline endpoint (`/workflows/{id}/run-test`)
-- Graph persistence endpoint (`/workflows/{id}/graph`)
+SmartFlow AI is pre-configured to be deployed for **$0 / month** on modern free-tier platforms:
 
-## Next Recommended Upgrades
+- **Frontend**: Deploy on [Vercel](https://vercel.com) with 1 click.
+- **Backend**: Deploy on [Render.com](https://render.com) using the included `render.yaml` or `Dockerfile`.
+- **Database**: Connect free PostgreSQL on [Supabase](https://supabase.com) or [Neon.tech](https://neon.tech), or use built-in SQLite.
+- **AI Engine**: Free API key from [Groq Cloud Console](https://console.groq.com/keys) (Llama 3.3 70B).
 
-- Multi-tenant auth (Clerk/NextAuth + RBAC)
-- Drag-and-drop workflow builder UI
-- LangGraph state machine with tool execution nodes
-- Gmail/Slack/WhatsApp/Stripe integrations
-- Audit logs, retries, and webhook signature verification
-# Business_WorkFlow_Automation_Platform
+👉 **[Read the Full Free Deployment Guide](./DEPLOYMENT_GUIDE.md)** for step-by-step instructions.
+
+---
+
+## 📂 Project Structure
+
+```
+Business_WorkFlow_Automation_Platform/
+├── backend/
+│   ├── app/
+│   │   ├── config.py              # Configuration & multi-LLM env settings
+│   │   ├── db.py                  # Resilient SQLAlchemy DB connector (SQLite + Postgres)
+│   │   ├── models.py              # Workflow & WorkflowRun execution history models
+│   │   ├── schemas.py             # Pydantic schemas
+│   │   ├── routers/
+│   │   │   └── workflows.py       # Full CRUD, template cloning, test execution & analytics
+│   │   └── services/
+│   │       ├── agent_graph.py     # Multi-provider AI generation & LangGraph state machine
+│   │       ├── templates.py       # Catalog of pre-built SMB workflows
+│   │       └── rag.py             # Vector RAG retrieval service
+│   ├── Dockerfile                 # Production Docker image
+│   ├── requirements.txt           # Python dependencies
+│   └── .env.example               # Backend environment variables template
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── layout.tsx         # Root layout
+│   │   │   ├── page.tsx           # Dashboard view
+│   │   │   └── globals.css        # Tailwind CSS styles
+│   │   ├── components/
+│   │   │   └── dashboard.tsx      # Comprehensive SaaS dashboard & Drag-and-Drop builder
+│   │   └── lib/
+│   │       └── api.ts             # Typed Axios API client & models
+│   ├── package.json               # Next.js 16 + React 19 dependencies
+│   └── postcss.config.mjs         # PostCSS & Tailwind v4 config
+├── render.yaml                    # 1-click Render.com deployment blueprint
+├── DEPLOYMENT_GUIDE.md            # Step-by-step free deployment walkthrough
+└── README.md                      # Project documentation
+```
+
